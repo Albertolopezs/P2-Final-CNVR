@@ -1,0 +1,236 @@
+heat_template_version: 2017-02-24
+description: Despliegue de una MV conectada a la net1.
+
+parameters:
+ public_network_id:
+  type: string
+  label: Public Network ID
+  description: Identifier of the public network
+ admin_server_port:
+  type: string
+  label: Port to the admin server
+  description: Port to connect to the admin server (SSH)
+
+resources:
+#Networks
+
+ net1:
+  type: OS::Neutron::Net
+  properties:
+   name: net1
+
+ subnet1:
+  type: OS::Neutron::Subnet
+  properties:
+   gateway_ip: 10.0.11.1
+   network_id: { get_resource: net1 }
+   cidr: 10.0.11.0/24
+
+ net2:
+  type: OS::Neutron::Net
+  properties:
+   name: net2
+
+ subnet2:
+  type: OS::Neutron::Subnet
+  properties:
+   gateway_ip: 10.0.12.1
+   network_id: { get_resource: net2 }
+   cidr: 10.0.12.0/24
+
+#Routers
+
+ router1:
+  type: OS::Neutron::Router
+  properties:
+   external_gateway_info:
+    network: { get_param: public_network_id }
+
+ router1_interface:
+  type: OS::Neutron::RouterInterface
+  properties:
+   router: { get_resource: router1 }
+   subnet: { get_resource: subnet1 }
+
+# Ports
+
+ Server1-1Port:
+  type: OS::Neutron::Port
+  properties:
+   network_id: { get_resource: net1 }
+   fixed_ips:
+    - ip_address: 10.0.11.101
+
+ Server1-2Port:
+  type: OS::Neutron::Port
+  properties:
+   network_id: { get_resource: net2 }
+   fixed_ips:
+    - ip_address: 10.0.12.101
+
+#Floating IPs
+
+ AdminServerPort:
+  type: OS::Neutron::Port
+  properties:
+   network_id: { get_resource: net1 }
+   fixed_ips:
+    - subnet_id: { get_resource: subnet1 }
+
+ AdminServerFloatingIP:
+  type: OS::Neutron::FloatingIP
+  properties:
+   floating_network_id: { get_param: public_network_id }
+   port_id: { get_resource: AdminServerPort }
+
+ LoadBalancerFloatingIP:
+  type: OS::Neutron::FloatingIP
+  properties:
+   floating_network_id: { get_param: public_network_id }
+   port_id: { get_attr: [ load_balancer , vip_port_id ]  }
+
+#Load Balancer
+
+ load_balancer:
+  type: OS::Neutron::LBaaS::LoadBalancer
+  properties:
+   name: load_balancer
+   vip_subnet: {get_resource: subnet1}
+
+ load_balancer_pool:
+  type: OS::Neutron::LBaaS::Pool
+  properties:
+   name: load_balancer_pool
+   lb_algorithm: ROUND_ROBIN
+   protocol: HTTP
+   listener: {get_resource: load_balancer_listener}
+ 
+ load_balancer_listener:
+  type: OS::Neutron::LBaaS::Listener
+  properties:
+   name: load_balancer_listener
+   protocol: HTTP
+   protocol_port: 80
+   loadbalancer: {get_resource: load_balancer}
+
+#Pool Members
+
+ pool_member1:
+  type: OS::Neutron::LBaaS::PoolMember
+  properties:
+   pool: { get_resource: load_balancer_pool }
+   address: { get_attr: [ Server1, networks, net1, 0 ]}
+   subnet: {get_resource: subnet1}
+   protocol_port: 80
+
+ pool_member2:
+  type: OS::Neutron::LBaaS::PoolMember
+  properties:
+   pool: { get_resource: load_balancer_pool }
+   address: { get_attr: [ Server2, networks, net1, 0 ]}
+   subnet: {get_resource: subnet1}
+   protocol_port: 80
+
+ pool_member3:
+  type: OS::Neutron::LBaaS::PoolMember
+  properties:
+   pool: { get_resource: load_balancer_pool }
+   address: { get_attr: [ Server3, networks, net1, 0 ]}
+   subnet: {get_resource: subnet1}
+   protocol_port: 80
+
+
+#Servidores
+ Server1:
+  type: OS::Nova::Server
+  properties:
+   name: server1 
+   image: xenial-server-cloudimg-amd64-vnx
+   flavor: m1.smaller
+   user_data_format: RAW
+   user_data: |
+    #!/bin/bash
+    echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
+    ifup ens4
+   networks:
+    - port: { get_resource: Server1-1Port }
+    - port: { get_resource: Server1-2Port }
+
+ Server2:
+  type: OS::Nova::Server
+  properties:
+   name: server2 
+   image: xenial-server-cloudimg-amd64-vnx
+   flavor: m1.smaller
+   user_data_format: RAW
+   user_data: |
+    #!/bin/bash
+    echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
+    ifup ens4
+   networks:
+    - network: { get_resource: net1 }
+    - network: { get_resource: net2 }
+ 
+ Server3:
+  type: OS::Nova::Server
+  properties:
+   name: server3
+   image: xenial-server-cloudimg-amd64-vnx
+   flavor: m1.smaller
+   user_data_format: RAW
+   user_data: |
+    #!/bin/bash
+    echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
+    ifup ens4
+   networks:
+    - network: { get_resource: net1 }
+    - network: { get_resource: net2 }
+
+ AdminServer:
+  type: OS::Nova::Server
+  properties:
+   name: adminserver
+   image: xenial-server-cloudimg-amd64-vnx
+   flavor: m1.smaller
+   user_data_format: RAW
+   user_data: |
+    #!/bin/bash
+    echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
+    ifup ens4
+   networks:
+    - port: { get_resource: AdminServerPort }
+    - network: { get_resource: net2 }
+
+ BBDDServer:
+  type: OS::Nova::Server
+  properties:
+   name: bbddserver
+   image: xenial-server-cloudimg-amd64-vnx
+   flavor: m1.smaller
+   networks:
+    - network: { get_resource: net2 }
+
+
+
+outputs:
+ Server1_private_ip:
+  description: The IP private address of the server1 instance
+  value: { get_attr: [Server1, first_address] }
+ Server2_private_ip:
+  description: The IP private address of the server2 instance
+  value: { get_attr: [Server2, first_address] }
+ Server3_private_ip:
+  description: The IP private address of the server3 instance
+  value: { get_attr: [Server3, first_address] }
+
+ AdminServer_private_ip:
+  description: The IP private address of the AdminServer instance
+  value: { get_attr: [AdminServer, first_address] }
+ AdminServer_public_ip:
+  description: The IP public address of the AdminServer instance
+  value: { get_attr: [AdminServerFloatingIP, floating_ip_address] }
+ LoadBalancer_public_ip:
+  description: The IP public address to access the servers
+  value: { get_attr: [LoadBalancerFloatingIP, floating_ip_address] }
+ 
+ 
