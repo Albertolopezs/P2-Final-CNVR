@@ -709,10 +709,11 @@ Copyright (C) 2020 Departamento de Ingenieria de Sistemas Telematicos (DIT)
         wget -P /tmp/images http://vnx.dit.upm.es/vnx/filesystems/ostack-images/xenial-server-cloudimg-amd64-disk1-vnx.qcow2
         glance image-create --name "xenial-server-cloudimg-amd64-vnx" --file /tmp/images/xenial-server-cloudimg-amd64-disk1-vnx.qcow2 --disk-format qcow2 --container-format bare --visibility public --progress
         rm /tmp/images/xenial-server-cloudimg-amd64-disk1*.qcow2
+
 		#Server image (genial)
-		cp /mnt/tmp/serverSS.qcow2 /tmp/images/.
-		glance image-create --name "server-image" --file /mnt/tmp/serverSS.qcow2 --disk-format qcow2 --container-format bare --visibility public --progress
-		rm /mnt/tmp/serverSS.qcow2
+		wget -P /tmp/images https://dl.cloudsmith.io/public/cnvr/openstack/raw/names/server-image/versions/1.0/serverSS.qcow2
+		glance image-create --name "server-image" --file /tmp/images/serverSS.qcow2 --disk-format qcow2 --container-format bare --visibility public --progress
+		rm /tmp/images/serverSS.qcow2
 
         #wget -P /tmp/images http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
         #glance image-create --name "CentOS-7-x86_64" --file /tmp/images/CentOS-7-x86_64-GenericCloud.qcow2 --disk-format qcow2 --container-format bare --visibility public --progress
