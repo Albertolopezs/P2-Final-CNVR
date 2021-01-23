@@ -21,6 +21,7 @@ resources:
 
  subnet1:
   type: OS::Neutron::Subnet
+  depends_on: [ net1 ]
   properties:
    gateway_ip: 10.0.11.1
    dns_nameservers: [8.8.8.8]
@@ -34,6 +35,7 @@ resources:
 
  subnet2:
   type: OS::Neutron::Subnet
+  depends_on: [ net2 ]
   properties:
    gateway_ip: 10.0.12.1
    dns_nameservers: [8.8.8.8]
@@ -60,6 +62,7 @@ resources:
 
  AdminServerPort:
   type: OS::Neutron::Port
+  depends_on: [ subnet1 ]
   properties:
    network_id: { get_resource: net1 }
    fixed_ips:
@@ -67,12 +70,14 @@ resources:
 
  AdminServerFloatingIP:
   type: OS::Neutron::FloatingIP
+  depends_on: [ AdminServerPort ]
   properties:
    floating_network_id: { get_param: public_network_id }
    port_id: { get_resource: AdminServerPort }
 
  LoadBalancerFloatingIP:
   type: OS::Neutron::FloatingIP
+  depends_on: [ load_balancer ]
   properties:
    floating_network_id: ExtNet
    port_id: { get_attr: [ load_balancer , vip_port_id ]  }
@@ -140,6 +145,7 @@ resources:
     #!/bin/bash
     echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
     ifup ens4
+    echo 'Servidor 1' > /var/www/html/index.html
    networks:
     - network: { get_resource: net1 }
     - network: { get_resource: net2 }
@@ -155,6 +161,7 @@ resources:
     #!/bin/bash
     echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
     ifup ens4
+    echo 'Servidor 2' > /var/www/html/index.html
    networks:
     - network: { get_resource: net1 }
     - network: { get_resource: net2 }
@@ -170,6 +177,7 @@ resources:
     #!/bin/bash
     echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
     ifup ens4
+    echo 'Servidor 3' > /var/www/html/index.html
    networks:
     - network: { get_resource: net1 }
     - network: { get_resource: net2 }
