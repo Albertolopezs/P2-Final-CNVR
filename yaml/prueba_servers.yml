@@ -23,6 +23,7 @@ resources:
   type: OS::Neutron::Subnet
   properties:
    gateway_ip: 10.0.11.1
+   dns_nameservers: [8.8.8.8]
    network_id: { get_resource: net1 }
    cidr: 10.0.11.0/24
 
@@ -35,6 +36,7 @@ resources:
   type: OS::Neutron::Subnet
   properties:
    gateway_ip: 10.0.12.1
+   dns_nameservers: [8.8.8.8]
    network_id: { get_resource: net2 }
    cidr: 10.0.12.0/24
 
@@ -44,7 +46,7 @@ resources:
   type: OS::Neutron::Router
   properties:
    external_gateway_info:
-    network: { get_param: public_network_id }
+    network: ExtNet
 
  router1_interface:
   type: OS::Neutron::RouterInterface
@@ -52,21 +54,7 @@ resources:
    router: { get_resource: router1 }
    subnet: { get_resource: subnet1 }
 
-# Ports
 
- Server1-1Port:
-  type: OS::Neutron::Port
-  properties:
-   network_id: { get_resource: net1 }
-   fixed_ips:
-    - ip_address: 10.0.11.101
-
- Server1-2Port:
-  type: OS::Neutron::Port
-  properties:
-   network_id: { get_resource: net2 }
-   fixed_ips:
-    - ip_address: 10.0.12.101
 
 #Floating IPs
 
@@ -86,7 +74,7 @@ resources:
  LoadBalancerFloatingIP:
   type: OS::Neutron::FloatingIP
   properties:
-   floating_network_id: { get_param: public_network_id }
+   floating_network_id: ExtNet
    port_id: { get_attr: [ load_balancer , vip_port_id ]  }
 
 #Load Balancer
@@ -145,7 +133,7 @@ resources:
   type: OS::Nova::Server
   properties:
    name: server1 
-   image: xenial-server-cloudimg-amd64-vnx
+   image: server-image
    flavor: m1.smaller
    user_data_format: RAW
    user_data: |
@@ -153,14 +141,14 @@ resources:
     echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
     ifup ens4
    networks:
-    - port: { get_resource: Server1-1Port }
-    - port: { get_resource: Server1-2Port }
+    - network: { get_resource: net1 }
+    - network: { get_resource: net2 }
 
  Server2:
   type: OS::Nova::Server
   properties:
    name: server2 
-   image: xenial-server-cloudimg-amd64-vnx
+   image: server-image
    flavor: m1.smaller
    user_data_format: RAW
    user_data: |
@@ -175,7 +163,7 @@ resources:
   type: OS::Nova::Server
   properties:
    name: server3
-   image: xenial-server-cloudimg-amd64-vnx
+   image: server-image
    flavor: m1.smaller
    user_data_format: RAW
    user_data: |
