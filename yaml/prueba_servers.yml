@@ -225,6 +225,9 @@ outputs:
  AdminServer_public_ip:
   description: The IP public address of the AdminServer instance
   value: { get_attr: [AdminServerFloatingIP, floating_ip_address] }
+ LoadBalancer_private_ip:
+  description: The IP private address of the LoadBalancer instance
+  value: { get_attr: [load_balancer, vip_address] }
  LoadBalancer_public_ip:
   description: The IP public address to access the servers
   value: { get_attr: [LoadBalancerFloatingIP, floating_ip_address] }

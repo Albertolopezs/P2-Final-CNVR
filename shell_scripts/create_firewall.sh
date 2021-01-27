@@ -3,17 +3,18 @@
 customPort=$1
 
 #Floating IPs
-LB_FIP=$(openstack stack output show stack1 LoadBalancer_public_ip -f value -c output_value)
-AdminServer_FIP=$(openstack stack output show stack1 AdminServer_public_ip -f value -c output_value)
+LB_FIP=$(openstack stack output show stack1 LoadBalancer_private_ip -f value -c output_value)
+AdminServer_FIP=$(openstack stack output show stack1 AdminServer_private_ip -f value -c output_value)
 
-while [ ${LB_FIP} = 'None' ] || [ ${AdminServer_FIP} = 'None' ]
+while [ "${LB_FIP}" = 'None' ] || [ "${LB_FIP}" = '' ] || [ "${AdminServer_FIP}" = 'None' ] || [ "${AdminServer_FIP}" = '' ]
 do
 echo "Esperando a que se configure el escenario"
 sleep 10
-LB_FIP=$(openstack stack output show stack1 LoadBalancer_public_ip -f value -c output_value)
-AdminServer_FIP=$(openstack stack output show stack1 AdminServer_public_ip -f value -c output_value)
+LB_FIP=$(openstack stack output show stack1 LoadBalancer_private_ip -f value -c output_value)
+AdminServer_FIP=$(openstack stack output show stack1 AdminServer_private_ip -f value -c output_value)
 done
-
+echo "Load Balancer internal IP: ${LB_FIP}"
+echo "Admin Server internal IP: ${AdminServer_FIP}"
 
 #Ingress to Adminserver at {CustomPort} (SSH)
 openstack firewall group rule create \

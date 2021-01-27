@@ -7,6 +7,6 @@ cp ${projectPath}/xml/openstack_lab.xml .
 
 # "Launching openstack"
 sudo vnx -f openstack_lab.xml --create
-sudo vnx -f openstack_lab.xml -v -x start-all
+sudo vnx -f openstack_lab.xml -v -x start-all,load-img
 
 
