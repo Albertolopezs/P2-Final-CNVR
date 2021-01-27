@@ -3,20 +3,24 @@
 extNIC=$1
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 &&pwd )"
 
-source shell_scripts/credentials.sh #Executes in the current shell, modifying the credentials. Don't use sh
-
+: '
 echo "Step 1 - Downloading OpenStack stein"
-cp shell_scripts/init_OpenStack.sh /mnt/tmp/.
-cp serverSS.qcow2 /mnt/tmp/.
-sh /mnt/tmp/init_OpenStack.sh $DIR $extNIC
-rm -f /mnt/tmp/init_OpenStack.sh
+sh shell_scripts/download_openstack.sh
 
+echo "Step x - Initializing Openstack"
+sh shell_scripts/init_OpenStack.sh $DIR
 
+echo "Step 2 - Creating new user and project"
+. shell_scripts/credentials.sh #Necesitamos credenciales
+sh shell_scripts/create_new_user.sh
 
+. ./shell_scripts/credentials_g3.sh
+echo "Step 3 - Downloading images and creating security groups"
+sh shell_scripts/configure_openstack.sh $extNIC
+
+'
 echo "- Step 4 - Creating Stack with standar configuration."
+
 openstack stack create -t ./yaml/prueba_servers.yml --parameter "public_network_id=ExtNet" --parameter "admin_server_port=22" stack1
 
-#echo " - Step X - Configuring access and security."
-#cp shell_scripts/configure_security.sh /mnt/tmp/.
-#rm -f /mnt/tmp/configure_security.sh
-
+sh shell_scripts/create_firewall.sh 22
