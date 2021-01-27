@@ -1,0 +1,39 @@
+heat_template_version: 2017-02-24
+description: Despliegue de un Servidor.
+
+parameters:
+ server_name:
+  type: string
+  label: Server name
+  description: Identifier of the public network
+
+resources:
+#Servidor
+ new_server:
+  type: OS::Nova::Server
+  properties:
+   name: { get_param: server_name }
+   image: server-image
+   flavor: m1.smaller
+   user_data_format: RAW
+   user_data: |
+    #!/bin/bash
+    echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
+    ifup ens4
+    echo 'New server' > /var/www/html/index.html
+   networks:
+    - network: net1
+    - network: net2
+
+ pool_member:
+  type: OS::Neutron::LBaaS::PoolMember
+  properties:
+   pool: load_balancer_pool
+   address: { get_attr: [ new_server, networks, net1, 0 ]}
+   subnet: subnet1
+   protocol_port: 80
+
+outputs:
+ new_server_private_ip:
+  description: The IP private address of the new server instance
+  value: { get_attr: [ new_server, networks, net1, 0 ] }

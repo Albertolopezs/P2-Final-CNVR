@@ -23,6 +23,7 @@ resources:
   type: OS::Neutron::Subnet
   depends_on: [ net1 ]
   properties:
+   name: subnet1
    gateway_ip: 10.0.11.1
    dns_nameservers: [8.8.8.8]
    network_id: { get_resource: net1 }
@@ -37,6 +38,7 @@ resources:
   type: OS::Neutron::Subnet
   depends_on: [ net2 ]
   properties:
+   name: subnet2
    gateway_ip: 10.0.12.1
    dns_nameservers: [8.8.8.8]
    network_id: { get_resource: net2 }
@@ -201,8 +203,12 @@ resources:
   type: OS::Nova::Server
   properties:
    name: bbddserver
-   image: xenial-server-cloudimg-amd64-vnx
+   image: bbdd-image
    flavor: m1.smaller
+   user_data_format: RAW
+   user_data: |
+    #!/bin/bash
+    service mysql start
    networks:
     - network: { get_resource: net2 }
 
@@ -221,7 +227,7 @@ outputs:
 
  AdminServer_private_ip:
   description: The IP private address of the AdminServer instance
-  value: { get_attr: [AdminServer, first_address] }
+  value: { get_attr: [AdminServerPort, fixed_ips, 0, ip_address] }
  AdminServer_public_ip:
   description: The IP public address of the AdminServer instance
   value: { get_attr: [AdminServerFloatingIP, floating_ip_address] }

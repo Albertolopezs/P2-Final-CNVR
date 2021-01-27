@@ -715,6 +715,11 @@ Copyright (C) 2020 Departamento de Ingenieria de Sistemas Telematicos (DIT)
 		glance image-create --name "server-image" --file /tmp/images/serverSS.qcow2 --disk-format qcow2 --container-format bare --visibility public --progress
 		rm /tmp/images/serverSS.qcow2
 
+		#BBDD image (no tan genial)
+		wget -P /tmp/images https://dl.cloudsmith.io/public/cnvr/openstack/raw/names/BBDD_image/versions/1.1/BBDD_server.qcow2
+		glance image-create --name "bbdd-image" --file /tmp/images/BBDD_server.qcow2 --disk-format qcow2 --container-format bare --visibility public --progress
+		rm /tmp/images/BBDD_server.qcow2
+
         #wget -P /tmp/images http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
         #glance image-create --name "CentOS-7-x86_64" --file /tmp/images/CentOS-7-x86_64-GenericCloud.qcow2 --disk-format qcow2 --container-format bare --visibility public --progress
         #rm /tmp/images/CentOS-7-x86_64-GenericCloud.qcow2
@@ -726,6 +731,7 @@ Copyright (C) 2020 Departamento de Ingenieria de Sistemas Telematicos (DIT)
 		    # Create security group rules to allow ICMP, SSH and WWW access
 		    pfinal_project_id=$(openstack project show pfinal -c id -f value)
 		    pfinal_secgroup_id=$(openstack security group list -f value | grep default | grep $pfinal_project_id | cut -d " " -f1)
+			wait
 		    openstack security group rule create --proto icmp --dst-port 0 $pfinal_secgroup_id
 		    openstack security group rule create --proto tcp  --dst-port 80 $pfinal_secgroup_id
 		    openstack security group rule create --proto tcp  --dst-port 22 $pfinal_secgroup_id
