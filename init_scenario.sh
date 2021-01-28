@@ -1,6 +1,8 @@
 #!/bin/sh
 #Include getopt argparser 
 extNIC=$1
+customPort=$2
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 &&pwd )"
 
 
@@ -25,4 +27,9 @@ openstack stack create -t ./yaml/init_scenario.yml --parameter "public_network_i
 
 echo "- Step x - Creating and configuring firewall"
 
-sh shell_scripts/create_firewall.sh 22
+if [ "$customPort" = '']
+then
+	sh shell_scripts/create_firewall.sh 22
+else
+	sh shell_scripts/create_firewall.sh "$customPort"
+fi
