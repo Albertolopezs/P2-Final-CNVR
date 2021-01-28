@@ -66,6 +66,7 @@ resources:
   type: OS::Neutron::Port
   depends_on: [ subnet1 ]
   properties:
+   security_groups: [open]
    network_id: { get_resource: net1 }
    fixed_ips:
     - subnet_id: { get_resource: subnet1 }
@@ -142,6 +143,7 @@ resources:
    name: server1 
    image: server-image
    flavor: m1.smaller
+   security_groups: [open]
    user_data_format: RAW
    user_data: |
     #!/bin/bash
@@ -158,6 +160,7 @@ resources:
    name: server2 
    image: server-image
    flavor: m1.smaller
+   security_groups: [open]
    user_data_format: RAW
    user_data: |
     #!/bin/bash
@@ -175,6 +178,7 @@ resources:
    image: server-image
    flavor: m1.smaller
    user_data_format: RAW
+   security_groups: [open]
    user_data: |
     #!/bin/bash
     echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
@@ -205,6 +209,7 @@ resources:
    name: bbddserver
    image: bbdd-image
    flavor: m1.smaller
+   security_groups: [open]
    user_data_format: RAW
    user_data: |
     #!/bin/bash

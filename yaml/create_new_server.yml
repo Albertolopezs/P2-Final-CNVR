@@ -15,6 +15,7 @@ resources:
    name: { get_param: server_name }
    image: server-image
    flavor: m1.smaller
+   security_groups: [open]
    user_data_format: RAW
    user_data: |
     #!/bin/bash
