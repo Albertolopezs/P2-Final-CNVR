@@ -1,4 +1,4 @@
-# P2-Final-CNVR
+# Despliegue automático de una aplicación escalable sobre una nube OpenStack utilizando los servicios de orquestación de Heat
 
 El objetivo de esta práctica es el despliegue de una arquitectura de red en el servicio IaaS Openstack (OS). El sistema estará formado por un conjunto de servidores distribuidos, un balanceador de carga para repartir la carga entre dichos servidores, un servidor que actúa como base de datos, un servidor de administración para tareas de gestión y un firewall para garantizar la seguridad de la red entre otros componentes. A su vez, el sistema se ha diseñado para que sea escalable, es decir, que puedan añadirse más servidores para garantizar el funcionamiento en caso de que sea necesario ampliar la red.
 
