@@ -53,7 +53,6 @@ openstack firewall group rule create \
 #Create ingress and egress policy
 
 openstack firewall group policy create \
---firewall-rule adminSSH \
 --firewall-rule lbWWW \
 --firewall-rule rejectIngress \
 ingressPolicy
