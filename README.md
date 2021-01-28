@@ -19,7 +19,7 @@ Siendo <interfaz-externa> el nombre de la interfaz del equipo que tiene acceso a
 
 ## Topología
 
-![Topología de red](/img/topology.png)
+![Topología de red](/img/Topology.png)
 
 ## Licencia
 
