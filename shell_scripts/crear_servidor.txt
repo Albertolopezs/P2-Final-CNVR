@@ -1,8 +1,0 @@
-sudo apt install apache2
-apache2ctl start
-archivos en /var/www/html/index.html
-
-#Exportar Snapshots
-nova image-create --show --poll adminserver serverSS 
-glance image-download a0a45375-052e-4449-98af-c13cd73a0adb --file serverSS.qcow2 --progress
-

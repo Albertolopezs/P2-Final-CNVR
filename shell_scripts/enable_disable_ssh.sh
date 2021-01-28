@@ -2,8 +2,7 @@
 
 . shell_scripts/credentials_g3.sh
 
-create_or_delete=true
-while [ ${create_or_delete} = true ]
+while true
 read -p "Do you want to enable or disable SSH to the Admin server(E/D) or exit(0)? " ed
 do
 if [ "$ed" = 'E' ] || [ "$ed" = 'e' ];
@@ -14,7 +13,7 @@ then
 	ingressPolicy \
 	adminSSH
 	echo "Done."
-	create_or_delete=false
+	exit
 
 elif [ "$ed" = 'D' ] || [ "$ed" = 'd' ];
 then
@@ -22,11 +21,10 @@ then
 	ingressPolicy \
 	adminSSH
 	echo "Done."
-	create_or_delete=false
+	exit
 
 elif [ "$ed" = '0' ];
 then
-	create_or_delete=false
 	exit
 
 else

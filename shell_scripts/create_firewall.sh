@@ -8,7 +8,7 @@ AdminServer_FIP=$(openstack stack output show stack1 AdminServer_private_ip -f v
 
 while [ "${LB_FIP}" = 'None' ] || [ "${LB_FIP}" = '' ] || [ "${AdminServer_FIP}" = 'None' ] || [ "${AdminServer_FIP}" = '' ]
 do
-echo "Esperando a que se configure el escenario"
+echo "Esperando a que se configure el escenario..."
 sleep 10
 LB_FIP=$(openstack stack output show stack1 LoadBalancer_private_ip -f value -c output_value)
 AdminServer_FIP=$(openstack stack output show stack1 AdminServer_private_ip -f value -c output_value)

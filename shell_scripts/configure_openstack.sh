@@ -8,10 +8,13 @@ openstack security group create --description "Practica final" \
 
 #Ingress
 openstack security group rule create \
+--protocol any \
 --ingress --description "Allow all ingress" \
 --project pfinal --project-domain default open
 #Egress
+
 openstack security group rule create open \
+--protocol any \
 --egress --description "Allow all egress" \
 --project pfinal --project-domain default
 

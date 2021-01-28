@@ -177,8 +177,8 @@ resources:
    name: server3
    image: server-image
    flavor: m1.smaller
-   user_data_format: RAW
    security_groups: [open]
+   user_data_format: RAW
    user_data: |
     #!/bin/bash
     echo -e 'auto ens4\niface ens4 inet dhcp' | tee /etc/network/interfaces.d/ens4.cfg
