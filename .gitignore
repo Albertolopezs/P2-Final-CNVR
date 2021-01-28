@@ -2,3 +2,4 @@ cloud_config.yaml
 .nfs*
 serverSS.qcow2
 BBDD_server.qcow2
+.DS_Store
