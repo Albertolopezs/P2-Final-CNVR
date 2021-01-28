@@ -13,9 +13,10 @@ Esta práctica ha sido desarrollada por el grupo 3, cuyos miembros son:
 
 Para desplegar la arquitectura de OpenStack, desde uno de los equipos del laboratorio ejecutar.
 
-`$ sh init_scenario.sh <interfaz-externa>`
+`$ sh init_scenario.sh <interfaz-externa> <custom-ssh-port>`
 
-Siendo <interfaz-externa> el nombre de la interfaz del equipo que tiene acceso a Internet. Esta interfaz tiene asociada una dirección IP de la red 138.4.X.X y, según estándares de Ubuntu suele ser *enp1s0* o *enp2s0*
+Siendo <interfaz-externa> el nombre de la interfaz del equipo que tiene acceso a Internet. Esta interfaz tiene asociada una dirección IP de la red 138.4.X.X y, según estándares de Ubuntu suele ser *enp1s0* o *enp2s0*. Y <custom-ssh-port> el puerto que deseamos utilizar para el acceso por ssh al servidor del administrador. Si no se aporta este parámetro se utilizará por defecto el puerto 22.
+  *Esta funcionalidad no ha sido probada*
 
 ## Topología
 
